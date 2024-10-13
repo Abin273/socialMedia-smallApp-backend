@@ -21,7 +21,14 @@ const connectionRequestSchema = mongoose.Schema(
             },
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: {
+            transform(doc, ret) {
+                delete ret.__v;
+            },
+        },
+    }
 );
 
 const ConnectionRequestModel = mongoose.model(
