@@ -1,7 +1,7 @@
+import mongoose from "mongoose";
 import validator from "validator";
 
-
-export const isPasswordStrong = (password)=>{
+export const isPasswordStrong = (password) => {
     const options = {
         minLength: 6, // Minimum length of the password
         minLowercase: 1, // Minimum number of lowercase letters
@@ -10,8 +10,8 @@ export const isPasswordStrong = (password)=>{
         minSymbols: 1, // Minimum number of special characters (symbols)
     };
 
-    return validator.isStrongPassword(password, options)
-} 
+    return validator.isStrongPassword(password, options);
+};
 
 export const validateSignUpData = (req) => {
     const { firstName, lastName, email, password } = req.body;
@@ -27,4 +27,22 @@ export const validateSignUpData = (req) => {
     }
 };
 
+export const validateEditProfileData = (editData) => {
+    const allowedEditFields = [
+        "firstName",
+        "lastName",
+        "profileUrl",
+        "gender",
+        "age",
+        "about",
+        "skills",
+    ];
 
+    const isEditAllowed = Object.keys(editData).every((field) =>
+        allowedEditFields.includes(field)
+    );
+
+    return isEditAllowed;
+};
+
+export const validateObjectId = (id)=> mongoose.isValidObjectId(id)
