@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import validator from "validator";
 
 export const isPasswordStrong = (password) => {
@@ -43,3 +44,5 @@ export const validateEditProfileData = (editData) => {
 
     return isEditAllowed;
 };
+
+export const validateObjectId = (id)=> mongoose.isValidObjectId(id)
