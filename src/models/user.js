@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import { isPasswordStrong } from "../util/validation.js";
 
 const UserSchema = new mongoose.Schema(
     {
@@ -23,6 +24,13 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 4,
+            validate(value) {
+                if (!isPasswordStrong(value)) {
+                    throw new Error(
+                        "Password must contain atleast 1 uppercase, 1 lowercase, 1 number, 1 symbol"
+                    );
+                }
+            },
         },
         age: {
             type: Number,

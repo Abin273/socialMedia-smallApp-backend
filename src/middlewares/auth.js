@@ -1,21 +1,21 @@
-import jwt from "jsonwebtoken";
+import { verifyJwtToken } from "../util/jwt";
+import UserModel from "../models/user";
 
 export const verifyToken = async (req, res, next) => {
     try {
-        let token = req.header("Autherization"); //Autherization is setting in the header from the frontend
+        const { token } = req.cookies;
 
-        if(!token){
-            return res.status(403).send("Access Denied");
-        }
+        if (!token) return res.status(401).send("You are not authorized");
 
-        if(token.startsWith("Bearer ")){
-            token = token.slice(7,token.length).trimLeft();
-        }
+        const decodedObj = verifyJwtToken(token);
+        const { _id } = decodedObj;
 
-        const verified = jwt.verify(token,process.env.JWT_SECRET);
+        const user = await UserModel.findById(_id);
+        if (!user) throw new Error("User not found");
+
         req.user = verified;
-        next()
+        next();
     } catch (err) {
-        res.status(500).json({ error: err.message }); 
+        res.status(500).json({ error: err.message });
     }
-}
+};
