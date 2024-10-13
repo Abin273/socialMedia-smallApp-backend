@@ -2,6 +2,7 @@ import express from "express";
 import { authUser } from "../middlewares/auth.js";
 import ConnectionRequestModel from "../models/connectionRequest.js";
 import UserModel from "../models/user.js";
+import { REVIEW_REQUEST_STATUSES, SEND_REQUEST_STATUSES } from "../util/constants.js";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.get("/requests/received", authUser, async (req, res) => {
         const currentUser = req.user;
         const connectionRequests = await ConnectionRequestModel.find({
             toUserId: currentUser._id,
-            status: "interested",
+            status: SEND_REQUEST_STATUSES.IGNORED,
         })
             .select(["fromUserId", "createdAt"])
             .populate("fromUserId", USER_SAFE_DATA_FIELDS);
@@ -41,8 +42,8 @@ router.get("/connections", authUser, async (req, res) => {
         const currentUser = req.user;
         const connections = await ConnectionRequestModel.find({
             $or: [
-                { toUserId: currentUser._id, status: "accepted" },
-                { fromUserId: currentUser._id, status: "accepted" },
+                { toUserId: currentUser._id, status: REVIEW_REQUEST_STATUSES.ACCEPTED },
+                { fromUserId: currentUser._id, status: REVIEW_REQUEST_STATUSES.ACCEPTED },
             ],
         })
             // .select(["fromUserId", "createdAt"])

@@ -3,6 +3,7 @@ import { authUser } from "../middlewares/auth.js";
 import UserModel from "../models/user.js";
 import ConnectionRequestModel from "../models/connectionRequest.js";
 import { validateObjectId } from "../util/validation.js";
+import { REVIEW_REQUEST_STATUSES, SEND_REQUEST_STATUSES } from "../util/constants.js";
 
 const router = express.Router();
 
@@ -16,7 +17,10 @@ router.post("/send/:status/:toUserId", authUser, async (req, res) => {
         if (!isValidObjectId)
             throw new Error("Given 'toUserId' is not a valid objectId");
 
-        const allowedStatus = ["ignored", "interested"];
+        const allowedStatus = [
+            SEND_REQUEST_STATUSES.IGNORED,
+            SEND_REQUEST_STATUSES.INTERESTED,
+        ];
 
         if (!allowedStatus.includes(status)) {
             return res.status(400).json({
@@ -74,7 +78,7 @@ router.post("/review/:status/:requestId", authUser, async (req, res) => {
         const isValidObjectId = validateObjectId(requestId);
         if (!isValidObjectId)
             throw new Error("Given 'requestId' is not a valid objectId");
-        const allowedStatus = ["accepted", "rejected"];
+        const allowedStatus = [REVIEW_REQUEST_STATUSES.ACCEPTED, REVIEW_REQUEST_STATUSES.REJECTED];
         if (!allowedStatus.includes(status)) {
             return res
                 .status(400)
@@ -84,7 +88,7 @@ router.post("/review/:status/:requestId", authUser, async (req, res) => {
         const connectionRequest = await ConnectionRequestModel.findOne({
             _id: requestId,
             toUserId: user._id,
-            status: "interested",
+            status: SEND_REQUEST_STATUSES.INTERESTED,
         });
         if (!connectionRequest) {
             return res
